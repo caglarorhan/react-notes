@@ -1,10 +1,46 @@
+**React Notes**
+
+- jsx file
+- scss file
+
+
+
+
+**React Rulez**
+
+
+**Naming Conventions**
+ 
+ - Components are named like `component-name.component.jsx`
+ - Style files are named like `component-name.style.scss`
+ 
+
+**Special Syntax For SVG**
+
+ - `import {ReactComponent as Logo} from "react-scripts"`;
+ 
+ 
+**Init & Setup**
+
+`npx create-react-app APPNAME` this will install react, react-dom and react-scripts
+
+
+
+
 **File Structure is Important**
 
+- build
+- node_modules
 - src
+    - assets
     - components
         - component-name
             -componentname.component.jsx
-            -componentname.styles.css
+            -componentname.styles.scss
+    - pages
+        -page_name
+            - page-name.component.jsx
+            - page-name.style.scss
        
 **State**
 
@@ -30,6 +66,25 @@ React intercept the real event and make wanted changes about this event.
  
  -  
 
+**Routers**
+
+    import {Switch, Route, Link} from 'react-router-dom'
+
+ - Routers are part of react-router-dom
+ - 'Switch', 'Route', 'Link' are most useful imports from react-router-dom
+ - 'Switch' made only one route component match with the url
+ - 'Route' is a routing to components and at least must have 3 properties
+    - 'exact' (boolean to  match with  exact url pattern), default value is false
+    - 'path' is the url pattern
+    - 'component' is the target component route to 
+
+Sample routing is like:
+
+          <Switch>
+              <Route exact path='/' component={HomePage}/>
+              <Route exact path='/topics' component={TopicList}/>
+              <Route exact path='/topics/:topicId' component={TopicDetail}/>
+          </Switch>  
 
 **NPM notes**
  - npm update (package.json daki bagimliliklari update eder (onlerinde ^ isareti olanlari))
