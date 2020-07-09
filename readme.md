@@ -25,7 +25,11 @@
 `npx create-react-app APPNAME` this will install react, react-dom and react-scripts
 
 
+**The Job of React Developer**
 
+- Decide on Components
+- Decide the State and where it lives
+- What changes when state changes
 
 **File Structure is Important**
 
@@ -122,3 +126,4 @@ Sample routing is like:
    - after pulling a repository    run `npm install` to install dependencies, etc.
    
     
+**Change Test**
