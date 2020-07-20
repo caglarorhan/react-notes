@@ -126,4 +126,39 @@ Sample routing is like:
    - after pulling a repository    run `npm install` to install dependencies, etc.
    
     
-**Change Test**
+**Firebase Notes**
+ - install firabase with npm/yarn
+ - create a **firebase** folder under **src** folder
+ - create **firebase.utils.js** in this firebase folder
+ - import firebase libraries in this file
+ 
+        import firebase from "firebase/app";
+        import 'firebase/firestore';
+        import 'firebase/auth';
+        
+        // add config data (apikeys etc) from firebase project to here
+        
+        const config = { ... }
+        
+        //initialize firebase with this config
+        
+        firebase.initializeApp(config);
+        
+        export const auth = firebase.auth();
+        export const firestore = firebase.firestore();
+        
+        const provider = new firebase.auth.GoogleAuthProvider(); // For signing in with google
+        provider.setCustomParameters({prompt: 'select account'});
+        
+        export sonct signInWithGoogle = ()=> auth.singInWithPopup(provider);
+        
+        export default firebase;
+ 
+ - Now we can import  `auth` from `firebase.utils`
+ 
+       import {auth} from '../../firebase/firebase.utils';
+       
+ So we can use all `auth` methods there. Like `auth.signOut()`, `auth.onAuthStateChanged()`, `signInWithPopup()`, `auth.googleAuthProvider()`
+ 
+ 
+       
