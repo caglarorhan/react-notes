@@ -4,7 +4,13 @@
 - scss file
 
 
-
+**Most Needed Libraries**
+- react
+- react-dom
+- react-redux
+- react-router-dom
+- redux
+- redux-logger
 
 **React Rulez**
 
@@ -48,7 +54,7 @@
        
 **State**
 
-- State is converted into a props while stepping down in to a component.       
+- State is converted into  props while stepping down in to a component.       
 - Whenever state changed all sub positioning (under the states position in component tree) rerendered (render method called again). This is useful when some content effects the state from inside related component.     
 
 **Life Cycle Methods**
@@ -294,7 +300,9 @@ Predictable state management using the 3 principles.
 - applyMiddleware diger middlewareleri toplayip rootReducer icin hazilar. Root reducer da tum bu reducerlari(middleware) toplayip tek bir obje yapar.
 - redux bildigimiz gibi state isini daha dolaysiz sekilde kotariyor -ama daha kompleks bir yapisi var-
 - State gereken componen icinde {connect} i react-redux icinden import ediyoruz
-- Sonra bu komponenti `export default connect()(komponenetAdi)` ile connect higher functionu icinden gecirip sunuyoruz. 
+- Sonra bu komponenti `export default connect()(komponenetAdi)` ile connect higher functionu icinden gecirip sunuyoruz. connect bizi root-reducerá ulastiriyor. Boylece state root-reducer oluyor. 
+- logger log ekranina prev state, action, next state objelerinin degerlerini yazdiriyor.
+
 
 
 
