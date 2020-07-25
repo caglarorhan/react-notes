@@ -39,12 +39,12 @@
     - assets
     - components
         - component-name
-            -componentname.component.jsx
-            -componentname.styles.scss
+            - componentname.component.jsx
+            - componentname.styles.scss
     - pages
-        -page_name
-            - page-name.component.jsx
-            - page-name.style.scss
+       - page_name
+        - page-name.component.jsx
+        - page-name.style.scss
        
 **State**
 
@@ -57,7 +57,7 @@
 - componentDidUpdate
 - componentWillUnmount
 - shouldComponentUpdate (render oncesidir, render ve sonrasini tercihe bagli hle getirir (return true dondururse render devam eder, return false olursa render olmaz))
-- 
+
 
 **SyntheticEvent**
 
@@ -158,7 +158,131 @@ Sample routing is like:
  
        import {auth} from '../../firebase/firebase.utils';
        
- So we can use all `auth` methods there. Like `auth.signOut()`, `auth.onAuthStateChanged()`, `signInWithPopup()`, `auth.googleAuthProvider()`
+ So we can use all `auth` methods there. Like `auth.signOut()`, `auth.onAuthStateChanged()`, `signInWithPopup()`, `auth.googleAuthProvider()`;
+ - Every time we query firebase, firebase return one of two objects even if nothing exist at from that query. **QueryReference** and **QuerySnapShot** . These objects can be either Document or Collection versions.
  
+ **A typical firebase scenario is like:** 
+ 
+ 
+  - **Reach data source** 
+    
+    ` const ref = firestore.doc(DOCUMENT_PATH)`
+  
+  - get target data with `.get()` method. Beware of that this method is async. So use it with await in a async function.
+    
+     `const snapShot = await ref.get()`
+     
+  - check if returning object has `.exist` true.
+  
+     `if(!snapShot.exist){}`
+  - Put all ref, snapShot in a function to call later/anytime.
+  
+  - Initialize firebase with config parameter
+  
+    **SAMPLE FUNCTION**
+    
+        export const createUserProfileDocument = async (userAuth, additionalData)=>{
+            if(!userAuth) return;
+        const userRef = firestore.doc(`user/${userAuth.uid}`);
+        const snapShot = await userRef.get();
+        if(!snapShot.exists){
+            const {displayName, email} = userAuth;
+            const createdAt = new Date();
+            try{
+                await userRef.set({
+                    displayName,
+                    email,
+                    createdAt,
+                    ...additionalData
+                })
+            }catch(error){
+                console.log(`Error creating user: ${error.message}`)
+            }
+            }
+        return userRef;
+        } 
+    
+    Above returned userRef has `onSnapShot()` method which has a callback with default snapShot argument. `snapShot` object has id, and `data()` method.
+    
+    Sample usage on componentDidMount lifecycle:
+    
+                componentDidMount() {
+                     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+                         if(userAuth){
+                             const userRef = await createUserProfileDocument(userAuth);
+                             userRef.onSnapshot(snapShot => {
+                                 this.setState({
+                                     currentUser: {
+                                         id: snapShot.id,
+                                         ...snapShot.data()
+                                     }
+                                 },()=>{
+                                     console.log(this.state)
+                                 });
+             
+                             });
+             
+                         }
+                         this.setState({currentUser:userAuth})
+             
+                     })
+                 }
+         
+        
+  **Authentication**
+    
+  - firebase auth method return auth object
+  
+    `const auth = firebase.auth()`      
+    auth has some methods which can be used for login (authentication). These are provide login UI also.
+    
+     ` const provider = new firebase.auth.GoogleAuthProvider();`
+     
+     ` provider.setCustomParameters({prompt: 'select_account'});`
+     
+     `export const signInWithGoogle = ()=> auth.signInWithPopup(provider);` // you can call this function from any buttons click event after importing it.
+     
+     Using auth method to sign out: 
+     
+     `auth.signOut() `
+     
+     other auth methods
+        ` signUpWithEmailAndPassword({email, password})`
+        ` signInWithEmailAndPassword({email, password})`
+     
+     
  
        
+**Redux Notes**
+
+Redux is a library to manage large states. Redux can work with other UI libraries. Redux best fit with React. Redux is useful for sharing data between components. Redux uses the Flux Pattern (Action->Dispatcher->Store->View). Redux Flow is coming from this pattern.
+Redux allows react state to be more scalable.
+
+Predictable state management using the 3 principles.
+
+- Single source of truth (one single big object which describes entire state of the app)
+- State is ready only 
+- Changes using pure functions
+
+**Redux Flow** 
+ 
+ Action -> MIDDLEWARE -> Root Reducer -> Store ->REACT-> Dom Changes
+ 
+- Before root reducer, there are other reducers listening their component's actions.
+- Reducers are functions. Accept 2 parameters 1) currentState 2) action
+- action.type and action.payload will used to recreate new state and reducer returns this new state.
+
+
+**Root Reducer**
+
+- Combine all reducers and export them as one single rootReducer object
+
+**Store**
+
+-Inside `store.js` import createStore and applyMiddleware from redux 
+- Creates a store object and put (with applyMiddleware() method) all of them into that store. `store` came from `redux/store`
+- We are going to give this store to teh Provider (from react-redux library) in `index.js` file `<Provider store={store}>`, by doing this, provider can include all components and take actions from these components to give them to reducers.
+- In `store.js` file we can `import logger from 'redux-logger'` as a middleware to log and debug our code. 
+- Setting middlewares into store is an array. 
+
+
