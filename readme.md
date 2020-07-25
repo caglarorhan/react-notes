@@ -283,6 +283,18 @@ Predictable state management using the 3 principles.
 - Creates a store object and put (with applyMiddleware() method) all of them into that store. `store` came from `redux/store`
 - We are going to give this store to teh Provider (from react-redux library) in `index.js` file `<Provider store={store}>`, by doing this, provider can include all components and take actions from these components to give them to reducers.
 - In `store.js` file we can `import logger from 'redux-logger'` as a middleware to log and debug our code. 
-- Setting middlewares into store is an array. 
+- Setting middlewares that store expecting from redux is an array.
+
+
+
+**Turkish Quick Note**
+- redux redux-logger yukle
+- logger middlewareleri dizi olarak biriktirsin
+- store olustur, bunu yaparken createStore iki arguman alir birisi rootReducer digeri applyMiddleware fonksiyonu
+- applyMiddleware diger middlewareleri toplayip rootReducer icin hazilar. Root reducer da tum bu reducerlari(middleware) toplayip tek bir obje yapar.
+- redux bildigimiz gibi state isini daha dolaysiz sekilde kotariyor -ama daha kompleks bir yapisi var-
+- State gereken componen icinde {connect} i react-redux icinden import ediyoruz
+- Sonra bu komponenti `export default connect()(komponenetAdi)` ile connect higher functionu icinden gecirip sunuyoruz. 
+
 
 
