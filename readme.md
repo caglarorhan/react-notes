@@ -51,6 +51,12 @@
        - page_name
         - page-name.component.jsx
         - page-name.style.scss
+    - redux (if you need a component to interact with main state, put the component's redux files here)
+        - xyz
+            - xyz.reducer.js
+            - xyz.action.js
+            - xyz.types.js   
+            - xyz.utils.js 
        
 **State**
 
@@ -300,9 +306,25 @@ Predictable state management using the 3 principles.
 - applyMiddleware diger middlewareleri toplayip rootReducer icin hazilar. Root reducer da tum bu reducerlari(middleware) toplayip tek bir obje yapar.
 - redux bildigimiz gibi state isini daha dolaysiz sekilde kotariyor -ama daha kompleks bir yapisi var-
 - State gereken componen icinde {connect} i react-redux icinden import ediyoruz
-- Sonra bu komponenti `export default connect()(komponenetAdi)` ile connect higher functionu icinden gecirip sunuyoruz. connect bizi root-reducerá ulastiriyor. Boylece state root-reducer oluyor. 
+- Sonra bu komponenti `export default connect()(komponenetAdi)` ile connect higher functionu icinden gecirip sunuyoruz. connect bizi root-reducer'a ulastiriyor. Boylece state root-reducer oluyor. 
 - logger log ekranina prev state, action, next state objelerinin degerlerini yazdiriyor.
+- her reducer olusturuldugunda root reducer'a import edilmelidir.
+- Bir komponentte state icinden gerekli bir parcayi kullanmak istersek react-redux icinden import edilen connect higher function componentini kullanip state icindeki gerekli kismi bizim calistigimiz komponente arguman olarak dondurecek sekilde kullaniyoruz.
+- Genelde bu `mapStateToProps` degisken ismiyle `state`'ten gerekli kismi temsilen nesne olusturup,
+ 
+    `const mapStateToProps = ({cart: {cartItems}}) =>({
+         cartItems
+     })`
+    daha sonra bu nesneyi bizim komponent ile birlikte connect higher fonksiyonuna veriyoruz ve komponentimizi bu sekilde export ediyoruz (connect bize komponenti state icerigi girdisi ile geri veriyor)
+    
+    `export default connect(mapStateToProps)(CartDropdown);`
+    Bu arada komponentimiz eski girdileri yerine `mapStateToProps` ile gonderilen `{cartItems}` nesnesini arguman olarak alabiliyor. Bu sadece bunu alacagi anlamina gelmiyor.
 
+- **React Redux'ta component'ler storeá asla dogrudan ulasamazlar. `connect` bu iletisime aracilik eder.**
 
+- `mapStateToProps` ile state'i alip props olarak komponente sunuyoruz. connect'in ilk argumani
+- `mapDispatchToProps` ile state change tetikleniyor. connect'in ikinci argumani.
 
-
+- Ornegin CartIcon komponentinde 
+    `export default connect(mapStateToProps, mapDispatchToProps)(CartIcon);
+`
