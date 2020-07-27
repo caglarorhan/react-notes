@@ -317,10 +317,14 @@ Predictable state management using the 3 principles.
      })`
     daha sonra bu nesneyi bizim komponent ile birlikte connect higher fonksiyonuna veriyoruz ve komponentimizi bu sekilde export ediyoruz (connect bize komponenti state icerigi girdisi ile geri veriyor)
     
+    `const mapDispatchToProps = dispatch =>({
+         toggleCartHidden: ()=> dispatch(toggleCartHidden())
+     })`
+    
     `export default connect(mapStateToProps)(CartDropdown);`
     Bu arada komponentimiz eski girdileri yerine `mapStateToProps` ile gonderilen `{cartItems}` nesnesini arguman olarak alabiliyor. Bu sadece bunu alacagi anlamina gelmiyor.
 
-- **React Redux'ta component'ler storeá asla dogrudan ulasamazlar. `connect` bu iletisime aracilik eder.**
+- **React Redux'ta component'ler store'a asla dogrudan ulasamazlar. `connect` bu iletisime aracilik eder.**
 
 - `mapStateToProps` ile state'i alip props olarak komponente sunuyoruz. connect'in ilk argumani
 - `mapDispatchToProps` ile state change tetikleniyor. connect'in ikinci argumani.
@@ -328,3 +332,37 @@ Predictable state management using the 3 principles.
 - Ornegin CartIcon komponentinde 
     `export default connect(mapStateToProps, mapDispatchToProps)(CartIcon);
 `
+- `connect` bizi komponente baglar.
+
+- mapDispatchToProps dispatch adinda argumani alir ve geriye duz bir obje dondurmek zorundadir.
+    - Bu objedeki her entry bizim komponent icin bir prop sayilir.
+    - Her entry'nin key adi (kabul goren yaklasim olarak) aksiyon yaratici ile ayni isimde olmalidir. Isim verilmis bu key'ler bizim komponenete prop olarak gider ve komponent icinde dogrudan isimleriyle cagrilabilirler. (Event trgigger icinde vs.)
+    - Entry nin value degeri ise genelde bir fonksiyon olur. Bu fonksiyon cagirildiginda bir aksiyon gonderir.
+    - Bu fonksiyon bir obje donderir, type degeri aksiyonun adini tasir.
+    - Asagidaki kodlar net bir sekilde gosteriyor
+    
+            const increment = () => ({ type: 'INCREMENT' })
+            const decrement = () => ({ type: 'DECREMENT' })
+            const reset = () => ({ type: 'RESET' })
+            
+            const mapDispatchToProps = dispatch => {
+              return {
+                // dispatching actions returned by action creators
+                increment: () => dispatch(increment()),
+                decrement: () => dispatch(decrement()),
+                reset: () => dispatch(reset())
+              }
+            }
+
+    - Boylece komponent props olarak bunlari alir ve dogrudan iceride kullanir.
+
+        function Counter({ count, increment, decrement, reset }) {
+          return (
+            <div>
+              <button onClick={decrement}>-</button>
+              <span>{count}</span>
+              <button onClick={increment}>+</button>
+              <button onClick={reset}>reset</button>
+            </div>
+          )
+        }
