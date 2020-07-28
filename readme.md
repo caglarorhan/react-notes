@@ -327,8 +327,8 @@ Predictable state management using the 3 principles.
 
 - **React Redux'ta component'ler store'a asla dogrudan ulasamazlar. `connect` bu iletisime aracilik eder.**
 
-- `mapStateToProps` ile state'i alip props olarak komponente sunuyoruz. connect'in ilk argumani
-- `mapDispatchToProps` ile state change tetikleniyor. connect'in ikinci argumani.
+- `mapStateToProps` ile state'i alip props olarak komponente sunuyoruz. connect'in ilk argumani mapStateToProps sayilir. Default olarak ilk argumani object seklinde komponentin state'idir.
+- `mapDispatchToProps` ile state change tetikleniyor. connect'in ikinci argumani mapDispatchToProps sayilir. Default olarak ilk argumani dispatch built-in fonksiyonudur. Alinan dispatch fonksiyonun icinde cagrilir. Bu cagrida run edilecek actionlar yer alir.
 
 - Ornegin CartIcon komponentinde 
     `export default connect(mapStateToProps, mapDispatchToProps)(CartIcon);
@@ -371,8 +371,31 @@ Predictable state management using the 3 principles.
 - **mapDispatchToProps** detay:
     - `connect` metoduna 2. arguman olarak gonderilen fonksiyon `mapDispatchToProps` 
     - default olarak `mapDispatchToProps` (connectin 2. argumentteki fonksiyon) fonksiyonuna dispatch tek  arguman olarak giriyor.
-    - `dispatch` bir hazir fonksiyon (hangi kutuphaneden geliyor?). amaci komponent icinden bir aksiyon tetiklendiginde bunu komponent reducer'a iletmek (baglantiyi kuruyor).
+    - `dispatch` bir hazir fonksiyon (hangi kutuphaneden geliyor? Redux store'dan geliyormus `store.dispatch`). Amaci komponent icinden bir aksiyon tetiklendiginde bunu komponent reducer'a iletmek (baglantiyi kuruyor)(Dokumanlarinda store'a iletmek diyor.). State degisikliginin tek yolu olarak belirtiliyor.
     - dispatch fonksiyonu icinde fonksiyon cagrilari (dogrudan calistirilma cagrisi`()`) yer alabilir. Bu fonksiyonlarin isimleri aksiyonla ayni olursa best practice'tir (takibi kolaylastirir). 
     - dispatch icinden cagrilan fonksiyon komponentAdi.action.js icinde yazilmis bir fonksiyondur ve bir nesne dondurur `{type:'ACTION_TYPE'}`. Yani bu nesne `dispatch` fonksiyonuna donmus olur.
     - Komponent reducer'i icinde aksiyonun type'ina gore objeler doner. Root reducer icindeki combineReducers muhtelemen dispatch her cagrildiginda tetiklenir ve komponent reducer'dan donen objeyi entry olarak rootreducerdaki ana state'e ekler (yeniler). 
     - Boylece store degiskenine esitlenen createStore fonksiyonu rootReducer ile middleware leri yeniden derler. Ana state refresh olur.
+- Bir action (herhangi bir redux altindaki) baska bir komponentte kullanilabilir. Komponent icinde action dosyasini import etmek yeterlidir. Sonra mapDispatchToProps ile ayni sekilde aksiyon eklenir.
+- Eger bu iki temel fonksiyondan birisi kullanilmayacaksa connect icerisinde yerlerine null verilmelidir. 
+- Unutmayalim connect bir higher order function ve gorevi bizim komponenti alarak bu iki fonksiyonu icine gomup yeniden yine bizim komponenti export etmek.
+ `export default connect(mapStateToProps,mapDispatchToProps)(komponentAdi)` seklinde kullaniliyor.
+
+**Extra dispatch notlari**
+ - komponentler default olarak `props.dispatch` aldiklarindan bunun uzerinden de `action` larini `store`'a iletebilirler. Yani `connect()(KomponentAdi)` seklinde baglanti kurulursa.
+ 
+        function KomponentAdi ({digerHerhangiProp, dispatch}){
+        return (
+            <div>
+              <button onClick={() => dispatch({ type: 'DECREMENT' })}>-</button>
+              <span>{digerHerhangiProp}</span>
+              <button onClick={() => dispatch({ type: 'INCREMENT' })}>+</button>
+              <button onClick={() => dispatch({ type: 'RESET' })}>reset</button>
+            </div>
+        )
+        }
+        // seklinde dispatch iceriden yapilabilir. 
+        // Ama yapiyi sadelestirmek adina bir yukaridaki baslikta anlatildigi gibi
+        // dosyalara bolmek ve typeleri bir arada objelestirmek best practice sayiliyor.
+        
+ - `mapDispatchToProps` kelimesi zorunlu degildir ama geleneksel kullanimi budur. 
