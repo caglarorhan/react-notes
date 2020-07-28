@@ -24,7 +24,8 @@
 **Special Syntax For SVG**
 
  - `import {ReactComponent as Logo} from "react-scripts"`;
- 
+ - `import {ReactComponent as ShoppingIcon} from "../../assets/shopping-bag.svg"`;
+
  
 **Init & Setup**
 
@@ -53,10 +54,10 @@
         - page-name.style.scss
     - redux (if you need a component to interact with main state, put the component's redux files here)
         - xyz
-            - xyz.reducer.js
-            - xyz.action.js
-            - xyz.types.js   
-            - xyz.utils.js 
+            - xyz.reducer.js (recreate state with given action type, these are component reducers and combined in root reducer)
+            - xyz.action.js (include functions which return objects which includes action types)
+            - xyz.types.js  (store types names as an object)
+            - xyz.utils.js  (includes utility functions which can be used from components reducer)
        
 **State**
 
@@ -356,13 +357,22 @@ Predictable state management using the 3 principles.
 
     - Boylece komponent props olarak bunlari alir ve dogrudan iceride kullanir.
 
-        function Counter({ count, increment, decrement, reset }) {
-          return (
-            <div>
-              <button onClick={decrement}>-</button>
-              <span>{count}</span>
-              <button onClick={increment}>+</button>
-              <button onClick={reset}>reset</button>
-            </div>
-          )
-        }
+            function Counter({ count, increment, decrement, reset }) {
+              return (
+                <div>
+                  <button onClick={decrement}>-</button>
+                  <span>{count}</span>
+                  <button onClick={increment}>+</button>
+                  <button onClick={reset}>reset</button>
+                </div>
+              )
+            }
+
+- **mapDispatchToProps** detay:
+    - `connect` metoduna 2. arguman olarak gonderilen fonksiyon `mapDispatchToProps` 
+    - default olarak `mapDispatchToProps` (connectin 2. argumentteki fonksiyon) fonksiyonuna dispatch tek  arguman olarak giriyor.
+    - `dispatch` bir hazir fonksiyon (hangi kutuphaneden geliyor?). amaci komponent icinden bir aksiyon tetiklendiginde bunu komponent reducer'a iletmek (baglantiyi kuruyor).
+    - dispatch fonksiyonu icinde fonksiyon cagrilari (dogrudan calistirilma cagrisi`()`) yer alabilir. Bu fonksiyonlarin isimleri aksiyonla ayni olursa best practice'tir (takibi kolaylastirir). 
+    - dispatch icinden cagrilan fonksiyon komponentAdi.action.js icinde yazilmis bir fonksiyondur ve bir nesne dondurur `{type:'ACTION_TYPE'}`. Yani bu nesne `dispatch` fonksiyonuna donmus olur.
+    - Komponent reducer'i icinde aksiyonun type'ina gore objeler doner. Root reducer icindeki combineReducers muhtelemen dispatch her cagrildiginda tetiklenir ve komponent reducer'dan donen objeyi entry olarak rootreducerdaki ana state'e ekler (yeniler). 
+    - Boylece store degiskenine esitlenen createStore fonksiyonu rootReducer ile middleware leri yeniden derler. Ana state refresh olur.
