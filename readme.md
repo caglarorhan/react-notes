@@ -327,7 +327,7 @@ Predictable state management using the 3 principles.
 
 - **React Redux'ta component'ler store'a asla dogrudan ulasamazlar. `connect` bu iletisime aracilik eder.**
 
-- `mapStateToProps` ile state'i alip props olarak komponente sunuyoruz. connect'in ilk argumani mapStateToProps sayilir. Default olarak ilk argumani object seklinde komponentin state'idir.
+- `mapStateToProps` ile state'i alip props olarak komponente sunuyoruz. connect'in ilk argumani mapStateToProps sayilir. Default olarak ilk argumani object seklinde komponentin state'idir. Store state her degistiginde mapStateToProps yeniden cagrilir. State'i bir butun olarak alir ve komponentin ihtiyaci olan bir parcasini obje olarak geri dondurur. 
 - `mapDispatchToProps` ile state change tetikleniyor. connect'in ikinci argumani mapDispatchToProps sayilir. Default olarak ilk argumani dispatch built-in fonksiyonudur. Alinan dispatch fonksiyonun icinde cagrilir. Bu cagrida run edilecek actionlar yer alir.
 
 - Ornegin CartIcon komponentinde 
@@ -382,7 +382,7 @@ Predictable state management using the 3 principles.
  `export default connect(mapStateToProps,mapDispatchToProps)(komponentAdi)` seklinde kullaniliyor.
 
 **Extra dispatch notlari**
- - komponentler default olarak `props.dispatch` aldiklarindan bunun uzerinden de `action` larini `store`'a iletebilirler. Yani `connect()(KomponentAdi)` seklinde baglanti kurulursa.
+ - komponentler default olarak `props.dispatch` aldiklarindan bunun uzerinden de `action` larini `store`'a iletebilirler. Yani `connect()(KomponentAdi)` seklinde baglanti kurulursa. Ama kendi `mapDispatchToProps` umuzu tanimalrsak o zaman komponent `dispatch` almak zorunda kalmaz! Onerilen best practice (daha betimleyicidir) de bu yondedir.
  
         function KomponentAdi ({digerHerhangiProp, dispatch}){
         return (
@@ -395,7 +395,45 @@ Predictable state management using the 3 principles.
         )
         }
         // seklinde dispatch iceriden yapilabilir. 
-        // Ama yapiyi sadelestirmek adina bir yukaridaki baslikta anlatildigi gibi
+        // Ama yapiyi sadelestirmek ve daha tanimlayici/deklaratif olmak adina bir yukaridaki baslikta anlatildigi gibi
         // dosyalara bolmek ve typeleri bir arada objelestirmek best practice sayiliyor.
         
- - `mapDispatchToProps` kelimesi zorunlu degildir ama geleneksel kullanimi budur. 
+ - `mapDispatchToProps` kelimesi zorunlu degildir ama geleneksel kullanimi bu kelimeyledir. 
+ - **Ayrica** deklaratif olarak `dispatch`'i enkapsule etmenin (fonksiyonlarla sarip sarmalamanin) bir avantaji da, komponent icinde yer alan child komponentlerin `Redux`'a `connect` olmasina gerek olmaksizin `action`'lari kullanabilmeleridir.
+- Eger `mapDispatchToProps` iki parametre alirsa (yazarsak) ikinci parametre `ownProps`'tur. Bu deger komponente gidecek olan ve action da kullanilabilecek diger parametreleri temsil eder. Bkz. asagisi.
+
+        render() {
+          return <button onClick={() => this.props.toggleTodo()} />
+        }
+        const mapDispatchToProps = (dispatch, ownProps) => {
+          return {
+            toggleTodo: () => dispatch(toggleTodo(ownProps.todoId))
+          }
+        }
+
+- Neticede `mapDispatchToProps` fonksiyonu bir nesne dondurmelidir.  Bu objenin her bir entrysi komponent icin bir prop olacaktir. Ayrica her bir entry cagrildiginda bir action gonderen birer fonksiyon olmalidir. Ilk verilen kod ornegi bu sekildedir.
+
+- `bindActionCreators` react redux tarafindan otomatik cagriliyor ama istersek biz de cagirip kullanabiliriz.
+- `dispatch => bindActionCreators(mapDispatchToProps, dispatch)`  boylece ayni sonuc elde edilmis olur.
+
+- Su kodlarla 
+
+        const mapDispatchToProps = dispatch => {
+          return {
+            increment: () => dispatch(increment()),
+            decrement: () => dispatch(decrement()),
+            reset: () => dispatch(reset()),
+            dispatch
+          }
+        } 
+
+- bu kodlar ayni isi yaparlar
+
+        import { bindActionCreators } from 'redux'
+        
+        function mapDispatchToProps(dispatch) {
+          return {
+            dispatch,
+            ...bindActionCreators({ increment, decrement, reset }, dispatch)
+          }
+        }
