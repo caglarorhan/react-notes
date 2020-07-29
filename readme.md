@@ -327,7 +327,23 @@ Predictable state management using the 3 principles.
 
 - **React Redux'ta component'ler store'a asla dogrudan ulasamazlar. `connect` bu iletisime aracilik eder.**
 
-- `mapStateToProps` ile state'i alip props olarak komponente sunuyoruz. connect'in ilk argumani mapStateToProps sayilir. Default olarak ilk argumani object seklinde komponentin state'idir. Store state her degistiginde mapStateToProps yeniden cagrilir. State'i bir butun olarak alir ve komponentin ihtiyaci olan bir parcasini obje olarak geri dondurur. 
+- `mapStateToProps` ile state'i alip props olarak komponente sunuyoruz. connect'in ilk argumani mapStateToProps sayilir. Default olarak ilk argumani object seklinde komponentin state'idir. Ikinci arguman ise `ownProps` eger komponentin kendi verisinden bir veri state erisiminde (id sorgusu vb) gerekli ise bununla otomatik alinir. Ornegin state id degerini aliyor ve bununla state icinde o id ye sahip item'in verisini cekmesi gerekiyorsa, `mapStateToProps` fonksiyonunda ikinci arguman olarak `ownProps` cagrilir ve fonksiyon icinde state verisi cekilirken kullanilir. Asagidaki ornekteki gibi.
+
+         // Todo.js
+         
+         function mapStateToProps(state, ownProps) {
+           const { visibilityFilter } = state
+           const { id } = ownProps
+           const todo = getTodoById(state, id)
+         
+           // component receives additionally:
+           return { todo, visibilityFilter }
+         }
+ 
+ // Later, in your application, a parent component renders:
+ <ConnectedTodo id={123} />
+ // and your component receives props.id, props.todo, and props.visibilityFilter
+ Store state her degistiginde mapStateToProps yeniden cagrilir. State'i bir butun olarak alir ve komponentin ihtiyaci olan bir parcasini obje olarak geri dondurur. mapStateProps eger state degismediyse calistirilmaz.
 - `mapDispatchToProps` ile state change tetikleniyor. connect'in ikinci argumani mapDispatchToProps sayilir. Default olarak ilk argumani dispatch built-in fonksiyonudur. Alinan dispatch fonksiyonun icinde cagrilir. Bu cagrida run edilecek actionlar yer alir.
 
 - Ornegin CartIcon komponentinde 
